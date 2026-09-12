@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page Not Found | Jig Bot</title>
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#080A0F',
+            'obsidian-card': '#10141E',
+            'obsidian-subtle': '#181E2C',
+            'terminal-border': '#222938',
+            gold: '#D4AF37',
+            'gold-light': '#F3E5AB',
+            'mt5-cyan': '#00E5FF',
+            'mt5-green': '#00E676',
+            'mt5-red': '#FF3D71'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-obsidian text-gray-100 min-h-screen flex flex-col justify-between font-sans selection:bg-gold selection:text-obsidian relative overflow-x-hidden">
+
+  <!-- Background Ambient Glow -->
+  <div class="fixed inset-0 pointer-events-none z-0">
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gold/5 rounded-full blur-[140px]"></div>
+    <div class="absolute bottom-10 right-10 w-[400px] h-[400px] bg-mt5-cyan/5 rounded-full blur-[120px]"></div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="relative z-10 border-b border-terminal-border/60 bg-obsidian/80 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+      <a href="index.html" class="flex items-center gap-3">
+        <img src="jigbot_logo.png" alt="Jig Bot Logo" class="h-9 w-9 object-contain" onerror="this.src='favicon.png'">
+        <span class="font-display font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-gold via-gold-light to-gold">JIG BOT</span>
+      </a>
+      <a href="https://t.me/jigbotchannel" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-mono text-mt5-cyan bg-mt5-cyan/10 border border-mt5-cyan/30 hover:bg-mt5-cyan/20 transition-all">
+        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+        <span>Official Channel</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Error Card -->
+  <main class="relative z-10 flex-1 flex items-center justify-center px-4 py-16">
+    <div class="max-w-xl w-full text-center space-y-8">
+      
+      <!-- Status Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono font-semibold bg-mt5-red/10 text-mt5-red border border-mt5-red/30 shadow-lg shadow-mt5-red/5">
+        <span class="w-2 h-2 rounded-full bg-mt5-red animate-pulse"></span>
+        <span>ERROR 404 • LIQUIDITY VOID DETECTED</span>
+      </div>
+
+      <!-- Giant 404 Graphic -->
+      <div class="relative">
+        <h1 class="text-8xl sm:text-9xl font-display font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-gray-400 to-obsidian-subtle select-none">
+          404
+        </h1>
+        <div class="absolute inset-x-0 bottom-2 text-sm font-mono text-gold font-bold tracking-widest uppercase">
+          Chart Out of Bounds
+        </div>
+      </div>
+
+      <!-- Descriptive Copy -->
+      <div class="space-y-3">
+        <h2 class="text-2xl sm:text-3xl font-display font-bold text-white">
+          The requested page does not exist.
+        </h2>
+        <p class="text-sm text-gray-400 leading-relaxed max-w-md mx-auto">
+          The route you navigated to has been liquidated or moved. Re-align your position with our official trading terminal below.
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+        <a href="index.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-display font-bold text-sm text-obsidian bg-gradient-to-r from-gold via-gold-light to-gold shadow-lg shadow-gold/25 hover:brightness-110 transition-all">
+          <i data-lucide="home" class="w-4 h-4"></i>
+          <span>Return to Terminal (jigbot.in)</span>
+        </a>
+
+        <a href="https://t.me/Jig_jbot?start=trial" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-display font-semibold text-sm text-white bg-obsidian-card border border-terminal-border hover:border-gold/50 hover:bg-obsidian-subtle transition-all">
+          <i data-lucide="bot" class="w-4 h-4 text-gold"></i>
+          <span>Request 7-Day Trial (@Jig_jbot)</span>
+        </a>
+      </div>
+
+      <!-- Signal Channel Reminder -->
+      <div class="pt-6 border-t border-terminal-border/60">
+        <p class="text-xs font-mono text-gray-400">
+          Need verification assistance? Reach our desk on Telegram: 
+          <a href="https://t.me/jigbotchannel" target="_blank" class="text-mt5-cyan hover:underline">@jigbotchannel</a>
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-terminal-border/60 py-6 text-center text-xs font-mono text-gray-400">
+    <div class="max-w-6xl mx-auto px-4">
+      &copy; <span id="year">2026</span> Jig Bot. High-Frequency XAUUSD M1 Adaptive Trading Engine.
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      document.getElementById('year').textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>

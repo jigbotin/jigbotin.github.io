@@ -1,8 +1,12 @@
-﻿# ZERO-LEAK SECURITY: Strict block on all MQL5 source code files & private tools
+# ZERO-LEAK SECURITY: Strict block on all source code files & private tools
 *.mq5
 *.mq4
 *.mqh
 *.cpp
 *.h
 *.log
+*.py
+*.cs
+*.exe
 license_generator.html
+leads_dashboard.html
