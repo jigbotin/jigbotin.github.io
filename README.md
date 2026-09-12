@@ -38,7 +38,7 @@
 | **VWAP Dynamic TP** | Volume-anchored profit targets | Captures volatility without fixed arbitrary pips |
 | **Capital Shield** | Automatic close-all on 40% drawdown | Guaranteed preservation of remaining capital |
 | **Cent Account Engine** | Compatible with 10,000 Cent accounts | Professional risk management on smaller deposits |
-| **Audio Telemetry** | 5 custom directional WAV sound cues | Real-time audio alerts for order events |
+| **Audio Telemetry** | 13 custom directional WAV sound cues | Real-time audio alerts for all 10 recovery levels & TP |
 | **Cryptographic Lock** | SHA-256 HMAC machine verification | Prevents piracy, unauthorized runs, and tampering |
 
 ---

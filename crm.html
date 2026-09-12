@@ -775,9 +775,11 @@
             <button class="action-btn reject-btn" onclick="rejectLead('${item.account_id}')" title="Reject Lead">❌</button>
           `;
         } else if (st === 'APPROVED' && item.key) {
+          const em = item.email || '';
           actionHtml = `
             <button class="action-btn" onclick="copyText('${item.key}')" title="Copy Key">🔑 Copy</button>
-            <button class="action-btn" onclick="copyActivation('${escapeHtml(item.name || 'Trader')}', '${item.account_id}', '${item.key}', '${expiry}')" title="Copy Activation Message">💬 Message</button>
+            <button class="action-btn" onclick="copyActivation('${escapeHtml(item.name || 'Trader')}', '${item.account_id}', '${item.key}', '${expiry}')" title="Copy Activation Message">💬 Msg</button>
+            <button class="action-btn" style="border-color:rgba(59,130,246,0.5); color:#60a5fa;" onclick="sendActivationEmail('${item.account_id}', '${escapeHtml(em)}', '${escapeHtml(item.name || 'Trader')}', '${item.key}', '${expiry}')" title="Send Luxury Activation Email">📧 Email</button>
           `;
         } else {
           actionHtml = `<span style="color:#666; font-size:12px;">Rejected</span>`;
@@ -800,6 +802,61 @@
           </tr>
         `;
       }).join('');
+    }
+
+    async function sendActivationEmail(acc, email, name, key, expiry) {
+      if (!email || !email.includes('@')) {
+        alert('This lead does not have a valid email address recorded.');
+        return;
+      }
+      
+      showToast('Dispatching activation email...');
+      const adminKey = sessionStorage.getItem('jigbot_admin_auth') || '1280398291';
+
+      try {
+        const res = await fetch(`https://jigbot-service.onrender.com/api/send_email?key=${encodeURIComponent(adminKey)}&account=${encodeURIComponent(acc)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok) {
+            showToast('✅ Activation email dispatched via SMTP with jig_bot.ex5 attached!');
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Backend SMTP API not reachable, falling back to client email:', e);
+      }
+
+      // Fallback: Open pre-composed luxury mailto template
+      const subject = encodeURIComponent(`🏆 Your Jig Bot 7-Day Demo Trial Activation (Account #${acc})`);
+      const body = encodeURIComponent(`Hello ${name},
+
+Your 7-Day Free Demo Trial for Jig Bot v1 has been verified and approved!
+
+📋 Official License Details (24-Hour UTC):
+• Authorized Account: #${acc}
+• License Tier: DEMO PRO (7 Days Free Trial / 168 Hours)
+• Expiry Date: ${expiry}
+• Target Instrument: XAUUSD (Gold) M1
+
+🔑 Official License Key:
+${key}
+
+⚙️ Fast 3-Minute MetaTrader 5 Setup:
+1. Download jig_bot.ex5: https://jigbotin.github.io/jig_bot.ex5
+2. In MT5: Click File -> Open Data Folder -> MQL5\\Experts\\ and paste jig_bot.ex5.
+3. In Navigator panel, right-click Expert Advisors -> Refresh.
+4. Open an XAUUSD M1 chart and drag Jig Bot onto the chart.
+5. Press F7 (Inputs) -> Paste your license key into InpLicenseKey.
+6. Enable 'Allow Algo Trading' at top of MT5.
+
+📢 Telegram Signal Channel: https://t.me/jigbotchannel
+🌐 Official Website: https://jigbotin.github.io
+
+Best regards,
+Jig Bot Verification Desk`);
+
+      window.open(`mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`, '_blank');
+      showToast('Opened pre-formatted activation email template!');
     }
 
     function copyText(text) {
