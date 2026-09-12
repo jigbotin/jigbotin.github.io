@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jig Bot — Live Trader Leads & Verification CRM</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDKs (Compat v10 for zero-build direct browser execution) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #07090E;
+      --bg-card: rgba(18, 22, 34, 0.75);
+      --border-card: rgba(212, 175, 55, 0.2);
+      --gold-primary: #E5C158;
+      --gold-gradient: linear-gradient(135deg, #FFF0B3 0%, #E5C158 50%, #B8860B 100%);
+      --text-main: #F0F4F8;
+      --text-muted: #8B949E;
+      --green: #22C55E;
+      --amber: #F59E0B;
+      --red: #EF4444;
+      --blue: #3B82F6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      padding: 30px 20px;
+      background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08), transparent 50%),
+                        radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.04), transparent 50%);
+    }
+
+    .container { max-width: 1320px; margin: 0 auto; }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 25px;
+      border-bottom: 1px solid var(--border-card);
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .brand { display: flex; align-items: center; gap: 15px; }
+    .brand img { width: 52px; height: 52px; object-fit: contain; }
+    .brand h1 { font-size: 26px; font-weight: 800; letter-spacing: 1.5px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .brand p { font-size: 13px; color: var(--text-muted); }
+    .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    /* Sync Status Badge */
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .sync-status:hover { border-color: var(--gold-primary); }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--amber);
+      display: inline-block;
+    }
+    .pulse-dot.live {
+      background: var(--green);
+      box-shadow: 0 0 10px var(--green);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .btn {
+      background: var(--gold-gradient);
+      color: #000;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35); }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); box-shadow: none; border-color: var(--gold-primary); }
+
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+    .kpi-title { font-size: 13px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 8px; }
+    .kpi-val { font-size: 32px; font-weight: 800; color: #fff; }
+    .kpi-val.green { color: var(--green); }
+    .kpi-val.amber { color: var(--amber); }
+    .kpi-val.gold { color: var(--gold-primary); }
+
+    /* Filters Bar */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      background: var(--bg-card);
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-card);
+      margin-bottom: 20px;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-box input:focus { border-color: var(--gold-primary); }
+
+    .filter-tabs { display: flex; gap: 8px; }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .tab-btn.active { background: rgba(212, 175, 55, 0.15); border-color: var(--gold-primary); color: var(--gold-primary); font-weight: 700; }
+
+    /* Table */
+    .table-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      overflow-x: auto;
+      backdrop-filter: blur(12px);
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+    th {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 14px 16px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1px solid var(--border-card);
+    }
+    td { padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); vertical-align: middle; }
+    tr:hover td { background: rgba(212, 175, 55, 0.03); }
+
+    .account-tag { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #58a6ff; }
+    .key-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--gold-primary); background: rgba(212, 175, 55, 0.08); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(212, 175, 55, 0.2); }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .badge.approved { background: rgba(34, 197, 94, 0.15); color: var(--green); border: 1px solid rgba(34, 197, 94, 0.3); }
+    .badge.pending { background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge.rejected { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-right: 5px;
+      transition: all 0.15s;
+    }
+    .action-btn:hover { background: var(--gold-primary); color: #000; font-weight: 600; border-color: var(--gold-primary); }
+    .action-btn.approve-btn {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+      font-weight: 700;
+    }
+    .action-btn.approve-btn:hover {
+      background: var(--green);
+      color: #000;
+      border-color: var(--green);
+    }
+    .action-btn.reject-btn {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+    .action-btn.reject-btn:hover {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+    }
+
+    .file-input-hidden { display: none; }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: #1f242c;
+      color: var(--gold-primary);
+      border: 1px solid var(--gold-primary);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+      display: none;
+      z-index: 1000;
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    .modal-card {
+      background: #121622;
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 580px;
+      padding: 30px;
+      position: relative;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    }
+    .modal-card h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .modal-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--gold-primary); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
+    .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
+    .close-modal:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="brand">
+        <img src="jigbot_logo.png" alt="Jig Bot" onerror="this.src='favicon.png'">
+        <div>
+          <h1>JIG BOT LEADS CRM</h1>
+          <p>Real-Time Verification & Trader License Manager (2026)</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- Live Sync Status Indicator -->
+        <div class="sync-status" id="syncStatusBadge" onclick="openFirebaseModal()" title="Click to configure Cloud Firestore live sync">
+          <span class="pulse-dot" id="pulseDot"></span>
+          <span id="syncStatusText">Local Mode (JSON)</span>
+          <span style="font-size:11px; opacity:0.7;">⚙️</span>
+        </div>
+
+        <input type="file" id="jsonFileInput" class="file-input-hidden" accept=".json">
+        <button class="btn btn-secondary" onclick="document.getElementById('jsonFileInput').click()">📂 Load JSON</button>
+        <button class="btn" onclick="exportCsv()">📥 Export CSV</button>
+        <a href="license_generator.html" class="btn btn-secondary">🔑 Key Generator</a>
+      </div>
+    </header>
+
+    <!-- Metrics Grid -->
+    <div class="metrics-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Total Trial Leads</div>
+        <div class="kpi-val gold" id="kpiTotal">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Approved Licenses</div>
+        <div class="kpi-val green" id="kpiApproved">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Pending Verification</div>
+        <div class="kpi-val amber" id="kpiPending">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Conversion Rate</div>
+        <div class="kpi-val" style="color:#58a6ff;" id="kpiRate">0%</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍 Search by Name, Telegram @handle, MT5 Account #, Email, or Key..." oninput="renderTable()">
+      </div>
+      <div class="filter-tabs">
+        <button class="tab-btn active" onclick="setFilter('ALL', this)">All Leads</button>
+        <button class="tab-btn" onclick="setFilter('PENDING', this)">Pending Verification</button>
+        <button class="tab-btn" onclick="setFilter('APPROVED', this)">Approved</button>
+        <button class="tab-btn" onclick="setFilter('REJECTED', this)">Rejected</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Trader Name</th>
+            <th>Telegram User</th>
+            <th>MT5 Account #</th>
+            <th>Email Address</th>
+            <th>Status</th>
+            <th>Requested (24H UTC)</th>
+            <th>License Key</th>
+            <th>Expiry Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="leadsTableBody">
+          <tr>
+            <td colspan="9" style="text-align:center; padding: 40px; color: var(--text-muted);">
+              Initializing CRM Dashboard...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Admin Passcode Security Gate -->
+  <div id="adminGateModal" style="position: fixed; inset: 0; background: rgba(7,9,14,0.96); backdrop-filter: blur(14px); display: flex; align-items: center; justify-content: center; z-index: 99999;">
+    <div style="background: #10141E; border: 1px solid rgba(212,175,55,0.4); border-radius: 16px; padding: 36px 30px; max-width: 420px; width: 90%; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.9);">
+      <div style="width: 56px; height: 56px; margin: 0 auto 16px; background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px;">🔐</div>
+      <h2 style="font-size: 22px; font-weight: 800; color: #FFF; margin-bottom: 8px; letter-spacing: 0.5px;">Jig Bot CRM Security Gate</h2>
+      <p style="font-size: 13px; color: #8B949E; margin-bottom: 24px; line-height: 1.5;">Enter your Telegram Admin Chat ID or Master Key to access the verified trader database.</p>
+      <input type="password" id="adminGateInput" placeholder="Enter Admin Passcode" style="width: 100%; padding: 13px 16px; background: #07090E; border: 1px solid #222938; border-radius: 10px; color: #FFF; font-family: 'JetBrains Mono', monospace; font-size: 16px; text-align: center; margin-bottom: 16px; outline: none;" onkeydown="if(event.key==='Enter') unlockAdminGate()">
+      <button onclick="unlockAdminGate()" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #FFF0B3, #E5C158, #B8860B); border: none; border-radius: 10px; color: #07090E; font-weight: 800; font-size: 14px; cursor: pointer; transition: all 0.2s;">Unlock Dashboard</button>
+      <p id="adminGateErr" style="color: #EF4444; font-size: 12px; margin-top: 12px; display: none;">Invalid Passcode. Access Denied.</p>
+    </div>
+  </div>
+
+  <!-- Firebase Setup Modal -->
+  <div class="modal-backdrop" id="firebaseModal">
+    <div class="modal-card">
+      <button class="close-modal" onclick="closeFirebaseModal()">&times;</button>
+      <h2>🔥 Cloud Firestore Live Sync Setup</h2>
+      <p>
+        Connect directly to your Firebase Spark (Free) plan project to receive real-time leads from Telegram and the website without reloading or manual JSON updates!
+      </p>
+
+      <div class="form-group">
+        <label for="fbProjectId">Firebase Project ID</label>
+        <input type="text" id="fbProjectId" value="jigbot-e3d37" placeholder="e.g. jigbot-e3d37">
+      </div>
+
+      <div class="form-group">
+        <label for="fbConfigJson">Or Paste Web Config JSON (Optional for Web SDK Auth)</label>
+        <textarea id="fbConfigJson" rows="4" placeholder='{"apiKey": "...", "authDomain": "...", "projectId": "jigbot-e3d37"}'></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="disconnectFirebase()">Disconnect / Use Local JSON</button>
+        <button class="btn" onclick="saveFirebaseSettings()">🔥 Save & Connect Real-Time</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Message copied!</div>
+
+  <script>
+    const SECRET_SALT = 'JIG_BOT_SEC_OFFICIAL_2026_x9K!';
+    let leadsData = [];
+    let currentFilter = 'ALL';
+    let db = null;
+    let unsubscribeFirestore = null;
+    let audioCtx = null;
+
+    // 0. Admin Passcode Gate Validation
+    function checkAdminGate() {
+      const saved = sessionStorage.getItem("jig_admin_unlocked");
+      const params = new URLSearchParams(window.location.search);
+      const key = params.get("key");
+      if (saved === "true" || key === "1280398291" || key === "x9K!" || key === "JIG_BOT_SEC_OFFICIAL_2026_x9K!") {
+        const modal = document.getElementById("adminGateModal");
+        if (modal) modal.style.display = "none";
+        sessionStorage.setItem("jig_admin_unlocked", "true");
+      }
+    }
+
+    function unlockAdminGate() {
+      const input = document.getElementById("adminGateInput");
+      const val = input ? input.value.trim() : "";
+      if (val === "1280398291" || val === "x9K!" || val === "JIG_BOT_SEC_OFFICIAL_2026_x9K!") {
+        const modal = document.getElementById("adminGateModal");
+        if (modal) modal.style.display = "none";
+        sessionStorage.setItem("jig_admin_unlocked", "true");
+      } else {
+        const err = document.getElementById("adminGateErr");
+        if (err) err.style.display = "block";
+      }
+    }
+
+    // 1. Audio Notification Chime (Web Audio API - No external files needed)
+    function playNewLeadSound() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.type = 'sine';
+        const now = audioCtx.currentTime;
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.setValueAtTime(880.00, now + 0.12); // A5
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } catch (e) {}
+    }
+
+    // 2. Cryptographic SHA-256 Key Computation (Matches C# JigBotTelegramService)
+    async function computeLicenseKey(account, expiryStr) {
+      const raw = 'DEMO:' + account + ':' + expiryStr + ':' + SECRET_SALT;
+      const encoder = new TextEncoder();
+      const data = encoder.encode(raw);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const sig = hashArray.slice(0, 4).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join('');
+      return 'JIG-DEMO-' + account + '-' + expiryStr + '-' + sig;
+    }
+
+    // 3. Initialize on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      checkAdminGate();
+      initFirebase();
+    });
+
+    function initFirebase() {
+      const savedProjectId = localStorage.getItem('jigbot_fb_project_id') || 'jigbot-e3d37';
+      const savedConfig = localStorage.getItem('jigbot_fb_config');
+
+      let config = null;
+      if (savedConfig) {
+        try { config = JSON.parse(savedConfig); } catch (e) {}
+      } else if (savedProjectId) {
+        config = { projectId: savedProjectId };
+      }
+
+      if (config && config.projectId) {
+        try {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(config);
+          }
+          db = firebase.firestore();
+
+          // Update Status UI
+          document.getElementById('pulseDot').className = 'pulse-dot live';
+          document.getElementById('syncStatusText').textContent = 'Cloud Sync: Live (Firestore)';
+
+          // Subscribe to Real-Time Updates
+          if (unsubscribeFirestore) unsubscribeFirestore();
+          let initialLoad = true;
+
+          unsubscribeFirestore = db.collection('leads').onSnapshot((snapshot) => {
+            const list = [];
+            let hasNewPending = false;
+
+            snapshot.forEach((doc) => {
+              const data = doc.data();
+              data.account_id = data.account_id || doc.id;
+              list.push(data);
+              if (!initialLoad && data.status === 'PENDING') {
+                hasNewPending = true;
+              }
+            });
+
+            // Sort newest first
+            list.sort((a, b) => (b.requested_at || '').localeCompare(a.requested_at || ''));
+            leadsData = list;
+            updateDashboard();
+
+            if (hasNewPending) {
+              playNewLeadSound();
+              showToast('🔔 New Trial Request received live!');
+            }
+            initialLoad = false;
+          }, (err) => {
+            console.warn('Firestore subscription notice:', err.message);
+            fallbackToLocal();
+          });
+
+          return;
+        } catch (err) {
+          console.warn('Firebase init error:', err);
+        }
+      }
+
+      fallbackToLocal();
+    }
+
+    function fallbackToLocal() {
+      document.getElementById('pulseDot').className = 'pulse-dot';
+      document.getElementById('syncStatusText').textContent = 'Local Mode (JSON)';
+
+      fetch('trader_leads.json?t=' + Date.now())
+        .then(r => r.json())
+        .then(data => {
+          leadsData = data;
+          localStorage.setItem('jig_bot_leads_cache', JSON.stringify(data));
+          updateDashboard();
+        })
+        .catch(() => {
+          const cached = localStorage.getItem('jig_bot_leads_cache');
+          if (cached) {
+            try {
+              leadsData = JSON.parse(cached);
+              updateDashboard();
+            } catch (e) {}
+          }
+        });
+    }
+
+    // 4. File picker for local JSON
+    document.getElementById('jsonFileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          leadsData = JSON.parse(evt.target.result);
+          localStorage.setItem('jig_bot_leads_cache', JSON.stringify(leadsData));
+          updateDashboard();
+          showToast('Loaded ' + leadsData.length + ' leads from trader_leads.json!');
+        } catch (err) {
+          alert('Invalid JSON file format.');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // 5. Firebase Setup Modal Controls
+    function openFirebaseModal() {
+      document.getElementById('fbProjectId').value = localStorage.getItem('jigbot_fb_project_id') || 'jigbot-e3d37';
+      document.getElementById('fbConfigJson').value = localStorage.getItem('jigbot_fb_config') || '';
+      document.getElementById('firebaseModal').style.display = 'flex';
+    }
+
+    function closeFirebaseModal() {
+      document.getElementById('firebaseModal').style.display = 'none';
+    }
+
+    function saveFirebaseSettings() {
+      const pId = document.getElementById('fbProjectId').value.trim();
+      const cfg = document.getElementById('fbConfigJson').value.trim();
+
+      if (!pId && !cfg) {
+        alert('Please enter your Firebase Project ID or Web Config JSON.');
+        return;
+      }
+
+      if (pId) localStorage.setItem('jigbot_fb_project_id', pId);
+      if (cfg) localStorage.setItem('jigbot_fb_config', cfg);
+
+      closeFirebaseModal();
+      showToast('Firebase settings saved! Connecting live...');
+      initFirebase();
+    }
+
+    function disconnectFirebase() {
+      localStorage.removeItem('jigbot_fb_project_id');
+      localStorage.removeItem('jigbot_fb_config');
+      if (unsubscribeFirestore) unsubscribeFirestore();
+      db = null;
+      closeFirebaseModal();
+      fallbackToLocal();
+      showToast('Switched to Local JSON mode.');
+    }
+
+    // 6. 1-Click Approve / Reject Action directly from CRM Table
+    async function approveLead(acc) {
+      const item = leadsData.find(l => (l.account_id || '').toString() === acc.toString());
+      if (!item) return;
+
+      const now = new Date();
+      const expiryDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const yyyy = expiryDate.getUTCFullYear();
+      const mm = String(expiryDate.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(expiryDate.getUTCDate()).padStart(2, '0');
+      const hh = String(expiryDate.getUTCHours()).padStart(2, '0');
+      const min = String(expiryDate.getUTCMinutes()).padStart(2, '0');
+
+      const expiryStr = `${yyyy}${mm}${dd}`;
+      const expiryDisplay = `${yyyy}-${mm}-${dd} ${hh}:${min} UTC`;
+      const key = await computeLicenseKey(acc, expiryStr);
+
+      item.status = 'APPROVED';
+      item.key = key;
+      item.expiry = expiryStr;
+      item.expiry_display = expiryDisplay;
+      item.approved_at = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+
+      // Update in Firestore if connected
+      if (db) {
+        try {
+          await db.collection('leads').doc(acc.toString()).set(item, { merge: true });
+          showToast('✅ Account #' + acc + ' Approved & Synced to Firestore!');
+        } catch (e) {
+          console.warn('Firestore update failed:', e);
+          showToast('Approved locally (Firestore update failed: ' + e.message + ')');
+        }
+      } else {
+        localStorage.setItem('jig_bot_leads_cache', JSON.stringify(leadsData));
+        showToast('✅ Account #' + acc + ' Approved! (Saved to local cache)');
+      }
+
+      updateDashboard();
+    }
+
+    async function rejectLead(acc) {
+      const item = leadsData.find(l => (l.account_id || '').toString() === acc.toString());
+      if (!item) return;
+
+      item.status = 'REJECTED';
+
+      if (db) {
+        try {
+          await db.collection('leads').doc(acc.toString()).set({ status: 'REJECTED' }, { merge: true });
+          showToast('❌ Account #' + acc + ' marked as Rejected.');
+        } catch (e) {}
+      } else {
+        localStorage.setItem('jig_bot_leads_cache', JSON.stringify(leadsData));
+        showToast('❌ Account #' + acc + ' marked as Rejected.');
+      }
+
+      updateDashboard();
+    }
+
+    // 7. Filtering & Dashboard Rendering
+    function setFilter(f, btn) {
+      currentFilter = f;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable();
+    }
+
+    function updateDashboard() {
+      const total = leadsData.length;
+      const approved = leadsData.filter(l => l.status === 'APPROVED').length;
+      const pending = leadsData.filter(l => l.status === 'PENDING').length;
+      const rate = total > 0 ? Math.round((approved / total) * 100) + '%' : '0%';
+
+      document.getElementById('kpiTotal').textContent = total;
+      document.getElementById('kpiApproved').textContent = approved;
+      document.getElementById('kpiPending').textContent = pending;
+      document.getElementById('kpiRate').textContent = rate;
+
+      renderTable();
+    }
+
+    function renderTable() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const tbody = document.getElementById('leadsTableBody');
+
+      let filtered = leadsData.filter(item => {
+        if (currentFilter !== 'ALL' && item.status !== currentFilter) return false;
+        if (!q) return true;
+        const name = (item.name || '').toLowerCase();
+        const acc = (item.account_id || '').toString().toLowerCase();
+        const email = (item.email || '').toLowerCase();
+        const uname = (item.username || '').toLowerCase();
+        const key = (item.key || '').toLowerCase();
+        return name.includes(q) || acc.includes(q) || email.includes(q) || uname.includes(q) || key.includes(q);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 40px; color: var(--text-muted);">No records match your filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        const st = item.status || 'PENDING';
+        const badgeClass = st === 'APPROVED' ? 'approved' : (st === 'REJECTED' ? 'rejected' : 'pending');
+        const keyDisplay = item.key ? `<span class="key-tag">${item.key}</span>` : '<span style="color:#666;">Pending Approval</span>';
+        const expiry = item.expiry_display || item.expiry || '—';
+        const uname = item.username ? '@' + escapeHtml(item.username) : '<span style="color:#666;">no_handle</span>';
+        const tgId = item.chat_id ? escapeHtml(item.chat_id.toString()) : 'N/A';
+        const lang = (item.language || 'en').toUpperCase();
+
+        let actionHtml = '';
+        if (st === 'PENDING') {
+          actionHtml = `
+            <button class="action-btn approve-btn" onclick="approveLead('${item.account_id}')" title="Approve 7-Day Demo Key">✅ Approve</button>
+            <button class="action-btn reject-btn" onclick="rejectLead('${item.account_id}')" title="Reject Lead">❌</button>
+          `;
+        } else if (st === 'APPROVED' && item.key) {
+          actionHtml = `
+            <button class="action-btn" onclick="copyText('${item.key}')" title="Copy Key">🔑 Copy</button>
+            <button class="action-btn" onclick="copyActivation('${escapeHtml(item.name || 'Trader')}', '${item.account_id}', '${item.key}', '${expiry}')" title="Copy Activation Message">💬 Message</button>
+          `;
+        } else {
+          actionHtml = `<span style="color:#666; font-size:12px;">Rejected</span>`;
+        }
+
+        return `
+          <tr>
+            <td><strong>${escapeHtml(item.name || 'Trader')}</strong></td>
+            <td>
+              <div style="font-weight:600; color:#58a6ff;">${uname}</div>
+              <div style="font-size:11px; color:#8b949e;">ID: ${tgId} • ${lang}</div>
+            </td>
+            <td><span class="account-tag">#${escapeHtml(item.account_id || 'N/A')}</span></td>
+            <td><a href="mailto:${escapeHtml(item.email || '')}" style="color:#8b949e; text-decoration:none;">${escapeHtml(item.email || 'N/A')}</a></td>
+            <td><span class="badge ${badgeClass}">${st}</span></td>
+            <td style="color:#8b949e; font-size:12px;">${escapeHtml(item.requested_at || '—')}</td>
+            <td>${keyDisplay}</td>
+            <td style="color:#8b949e; font-size:13px;">${escapeHtml(expiry)}</td>
+            <td>${actionHtml}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text);
+      showToast('Key copied: ' + text);
+    }
+
+    function copyActivation(name, account, key, expiry) {
+      const msg = `👋 Hello ${name}! Here is your verified activation key for Jig Bot v1:
+
+🔑 License Key:
+${key}
+
+📋 License Details (24-Hour UTC Format):
+• Authorized Account: #${account}
+• License Tier: DEMO PRO (7 Days Free Trial / 168 Hours)
+• Expiry Date: ${expiry}
+• Target Symbol: XAUUSD (Gold) M1
+
+⚙️ Fast 3-Minute MetaTrader 5 Setup:
+1. Place jig_bot.ex5 in your MT5 Experts folder (File -> Open Data Folder -> MQL5\\Experts).
+2. Right-click Navigator -> Refresh.
+3. Attach Jig Bot to an XAUUSD M1 chart.
+4. Press F7 (Inputs) -> Paste your key into InpLicenseKey.
+5. Enable 'Allow Algo Trading' at top of MT5.
+6. Verify on-chart HUD turns [ACTIVE]!
+
+📢 Official Signal Channel: https://t.me/jigbotchannel`;
+
+      navigator.clipboard.writeText(msg);
+      showToast('Full Activation Message copied to clipboard!');
+    }
+
+    function exportCsv() {
+      if (leadsData.length === 0) {
+        alert('No leads data to export.');
+        return;
+      }
+      let csv = 'Full Name,MT5 Account,Email,Status,Requested Date (UTC),License Key,Expiry\n';
+      leadsData.forEach(l => {
+        csv += `"${l.name || ''}","${l.account_id || ''}","${l.email || ''}","${l.status || ''}","${l.requested_at || ''}","${l.key || ''}","${l.expiry_display || l.expiry || ''}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `jig_bot_leads_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2500);
+    }
+
+    function escapeHtml(str) {
+      return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

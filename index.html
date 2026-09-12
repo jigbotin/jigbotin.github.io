@@ -18,44 +18,68 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="jigbot_logo.png">
 
-    <!-- Open Graph (Facebook, WhatsApp, Telegram Link Previews) -->
+    <!-- Open Graph (WhatsApp, Telegram, Facebook, LinkedIn Link Previews) -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Jig Bot">
     <meta property="og:title" content="Jig Bot | Automated Gold Trading Engine for MetaTrader 5">
     <meta property="og:description"
         content="Institutional-grade automated trading engine engineered for XAUUSD on MetaTrader 5. Volatility capture, 10-level cluster grid, and intelligent capital protection.">
-    <meta property="og:image" content="og_preview.png">
-    <meta property="og:image:type" content="image/png">
+    <meta property="og:url" content="https://jigbotin.github.io/">
+    <meta property="og:image" content="https://jigbotin.github.io/og_preview.jpg">
+    <meta property="og:image:secure_url" content="https://jigbotin.github.io/og_preview.jpg">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:url" content="https://jigbotin.github.io/">
+    <meta property="og:image:alt" content="Jig Bot Institutional Gold Trading Engine">
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Jig Bot | Automated Gold Trading Engine for MT5">
     <meta name="twitter:description"
         content="Institutional-grade automated trading engine engineered for XAUUSD on MetaTrader 5. Request your 7-Day Demo Trial key.">
-    <meta name="twitter:image" content="og_preview.png">
+    <meta name="twitter:image" content="https://jigbotin.github.io/og_preview.jpg">
 
-    <!-- Structured Data: JSON-LD for Google Search -->
+    <!-- Structured Data: JSON-LD for Google Search Engine Optimization -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Jig Bot",
-      "operatingSystem": "MetaTrader 5 (Windows)",
-      "applicationCategory": "FinanceApplication",
-      "offers": {
-        "@type": "Offer",
-        "price": "0.00",
-        "priceCurrency": "USD",
-        "name": "7-Day Demo Trial"
-      },
-      "description": "Institutional-grade automated trading engine engineered for XAUUSD Gold on MetaTrader 5 desktop.",
-      "author": {
-        "@type": "Organization",
-        "name": "Jig Bot"
-      }
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "Jig Bot",
+          "operatingSystem": "MetaTrader 5 (Windows)",
+          "applicationCategory": "FinanceApplication",
+          "downloadUrl": "https://jigbotin.github.io/jig_bot.ex5",
+          "offers": {
+            "@type": "Offer",
+            "price": "0.00",
+            "priceCurrency": "USD",
+            "name": "7-Day Demo Trial",
+            "availability": "https://schema.org/InStock"
+          },
+          "description": "Institutional-grade automated trading engine engineered for XAUUSD Gold on MetaTrader 5 desktop.",
+          "author": {
+            "@type": "Organization",
+            "name": "Jig Bot",
+            "url": "https://jigbotin.github.io"
+          }
+        },
+        {
+          "@type": "Organization",
+          "name": "Jig Bot",
+          "url": "https://jigbotin.github.io",
+          "logo": "https://jigbotin.github.io/jigbot_logo.png",
+          "sameAs": [
+            "https://t.me/Jig_jbot",
+            "https://t.me/jigbotchannel"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "name": "Jig Bot",
+          "url": "https://jigbotin.github.io"
+        }
+      ]
     }
     </script>
 

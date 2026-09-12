@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /crm.html
+Disallow: /leads_dashboard.html
+
+Sitemap: https://jigbotin.github.io/sitemap.xml
