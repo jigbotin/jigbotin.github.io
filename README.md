@@ -8,7 +8,7 @@
   <p><strong>High-Frequency XAUUSD M1 Adaptive Trading Engine for MetaTrader 5</strong></p>
 
   <p>
-    <a href="https://jigbot.in"><img src="https://img.shields.io/badge/Official%20Website-jigbot.in-D4AF37?style=for-the-badge&logo=google-chrome&logoColor=black" alt="Website" /></a>
+    <a href="https://jigbotin.github.io"><img src="https://img.shields.io/badge/Official%20Website-jigbotin.github.io-D4AF37?style=for-the-badge&logo=github&logoColor=white" alt="Website" /></a>
     <a href="https://t.me/Jig_jbot"><img src="https://img.shields.io/badge/Telegram%20Bot-@Jig__jbot-229ED9?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram Bot" /></a>
     <a href="https://t.me/jigbotchannel"><img src="https://img.shields.io/badge/Signal%20Channel-@jigbotchannel-00E5FF?style=for-the-badge&logo=telegram&logoColor=black" alt="Channel" /></a>
     <a href="https://www.metatrader5.com/"><img src="https://img.shields.io/badge/Platform-MetaTrader%205-00E676?style=for-the-badge&logo=windows&logoColor=black" alt="MT5" /></a>
@@ -46,7 +46,7 @@
 ## 🚀 Fast 3-Minute MetaTrader 5 Setup
 
 1. **Download the EA:**
-   Download [`jig_bot.ex5`](jig_bot.ex5) directly from this repository or via the website at [jigbot.in](https://jigbot.in).
+   Download [`jig_bot.ex5`](jig_bot.ex5) directly from this repository or via the website at [jigbotin.github.io](https://jigbotin.github.io).
 2. **Install in MT5:**
    - In MetaTrader 5, click **File → Open Data Folder**.
    - Navigate to `MQL5\Experts\` and paste `jig_bot.ex5`.
@@ -73,7 +73,7 @@ You can test Jig Bot with zero financial risk on any MetaTrader 5 Demo Account:
 
 ## 🌐 Official Links & Community
 
-- **Official Website:** [https://jigbot.in](https://jigbot.in)
+- **Official Website:** [https://jigbotin.github.io](https://jigbotin.github.io)
 - **Telegram Verification Bot:** [@Jig_jbot](https://t.me/Jig_jbot)
 - **Live Signal Channel:** [@jigbotchannel](https://t.me/jigbotchannel)
 - **Support & Inquiries:** `jigbot.in@gmail.com`
